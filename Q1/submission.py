@@ -383,7 +383,7 @@ if __name__ == "__main__":
     # graph = Graph()
     # startNode = (LFID, 'Laurence Fishburne')
     # graph.add_node(id=startNode[0], name=startNode[1])
-    # tmdb_api_utils = TMDBAPIUtils(api_key='1b638b01c257f9d57373ead0b39c8eba')
+    # tmdb_api_utils = TMDBAPIUtils(api_key='INSERT API KEY')
 
     # Suggestion: code should contain steps outlined above in BUILD CO-ACTOR NETWORK
     # for i in range(2):
