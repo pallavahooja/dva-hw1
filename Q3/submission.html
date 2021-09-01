@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!-- cse6242 -->
+
+<!-- run: http-server & -->
+
+<head>
+  <style>
+    /* define CSS rules */
+  </style>
+  <title>Running Total of TMDb Movies by Year</title>
+</head>
+
+<body>
+
+  <script src="lib/d3/d3.min.js"></script>
+  <script src="lib/d3-dsv/d3-dsv.min.js"></script>
+  <script src="lib/d3-fetch/d3-fetch.min.js"></script>
+
+
+  <script>
+    // define the dimensions and margins for the graph
+    var width = 960;
+    var height = 500;
+    var marginLeft = 80;
+    var marginTop = 20;
+    var padding = 70;
+    var barPadding = 2;
+
+    // define function to parse time in years format
+    var parseTime = d3.timeParse("%Y");
+
+    // create scales x & y for X and Y axis and set their ranges
+    var x = d3.scaleTime().range([padding,  width - padding - marginLeft]);
+    var y = d3.scaleLinear().range([height - padding, padding]);
+
+
+    // append svg element to the body of the page
+    // set dimensions and position of the svg element
+    var svg = d3.select("body").append("svg")
+              .attr("width", width)
+              .attr("height", height);
+
+    // Get the data
+	  var pathToCsv = "q3.csv";		// path to csv
+
+    d3.dsv(",", pathToCsv, function (d) {
+      return {
+        // format data attributes if required
+        year: parseTime(d.year),
+        runningTotal: +d.running_total
+      }
+    }).then(function (data) {
+      console.log(data); // you should see the data in your browser's developer tools console
+
+      /* Create bar plot using data from csv */
+
+      // set the domains of X and Y scales based on data
+      x.domain([
+        d3.min(data, function(d) { return d.year }),
+        d3.max(data, function(d) { return d.year })
+      ]);
+      y.domain([
+        0,
+        d3.max(data, function(d) { return d.runningTotal })
+      ]);
+
+      // Add bars to svg - create new elements based on your data
+      var container = svg.append("g")
+                      .attr("transform", "translate(" + marginLeft + "," + marginTop + ")");
+
+      container.selectAll('rect')
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('x', function(d) { return x(d.year) })
+        .attr('y', function(d) { return y(d.runningTotal) })
+        .attr('width', function(d) { return width / data.length - barPadding })
+        .attr('height', function(d) { return height - padding - y(d.runningTotal) })
+        .attr('fill', 'dodgerblue')
+
+
+      // Add the X Axis
+      var xAxis = d3.axisBottom().scale(x);
+      container.append('g')
+        .attr('id', 'x_axis')
+        .attr("transform", "translate(0," + (height - padding) + ")")
+        .call(xAxis);
+
+      // Add the text label for X Axis
+      container.append('text')
+          .attr('id', 'x_axis_label')
+          .attr("text-anchor", "center")
+          .attr("x", width / 2 - 100)
+          .attr("y", height - 30)
+          .attr("fill", "black")
+          .text("Year");
+
+      // Add the Y Axis
+      var yAxis = d3.axisLeft().scale(y);
+      container.append('g')
+        .attr('id', 'y_axis')
+        .attr("transform", "translate(" + padding + ",0)")
+        .call(yAxis);
+
+      // Add the text label for Y axis
+      container.append('text')
+              .attr('id', 'y_axis_label')
+              .attr("text-anchor", "end")
+              .attr("transform", "rotate(-90)")
+              .attr("x", -200)
+              .attr("y", 0)
+              .text("Running Total");
+
+      // Title
+      container.append('text')
+              .attr('x', width / 2 - 250)
+              .attr('y', 40)
+              .attr('id', 'title')
+              .text('Running Total of TMDb Movies by Year')
+              .attr('font-size', '1.5rem');
+
+      // GT Username
+      container.append('text')
+              .attr('id', 'credit')
+              .attr("text-anchor", "end")
+              .attr('x', width - 150)
+              .attr('y', height - 30)
+              .attr('fill', '#505050')
+              .text('jmartin418')
+
+    }).catch(function (error) {
+      console.log(error);
+    });
+
+
+  </script>
+
+</body>
